@@ -6,6 +6,10 @@ use Illuminate\Support\Str;
 
 trait HasSlug
 {
+    /**
+     * HasSlug trait  generates a unique slug for a model when it is created.
+     * @return void
+     */
     protected static function bootHasSlug(): void
     {
         static::creating(function ($model) {
@@ -24,17 +28,4 @@ trait HasSlug
             $model->slug = $slug;
         });
     }
-
-//    public function resolveRouteBindingQuery($query, $value, $field = null){
-//
-//        $id = explode('_' , $value)[0];
-//        return $query->where($field ?? $this->getRouteKeyName(), $id);
-//    }
-//
-//    public function getSlugAttribute(){
-//
-//        return Str::slug($this->id . ' ' . $this->name);
-//    }
-
-
 }
