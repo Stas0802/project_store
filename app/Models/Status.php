@@ -9,7 +9,12 @@ class Status extends Model
 {
     use HasFactory;
 
-    public function orders(){
+    /**
+     * status can be for several orders
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function orders()
+    {
         return $this->hasMany(Order::class);
     }
 }
