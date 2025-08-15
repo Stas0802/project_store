@@ -3,63 +3,49 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use Illuminate\Http\Request;
+use App\Services\CartService;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class CartController extends Controller
 {
 
     /**
      * Show all product in cart
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application
+     * @param CartService $cartService
+     * @return Application|Factory|View|\Illuminate\Foundation\Application
      */
-    public function index(){
-        $cart = session('cart', []);
-        return view('cart.index', ['cart' => $cart]);
+    public function index(CartService $cartService): Factory|View|\Illuminate\Foundation\Application|Application
+    {
+        $cartData =  $cartService->cartData();
+        return view('cart.index', ['cartData' => $cartData]);
     }
 
 
     /**
      * Save product session in cart
-     * @param Request $request
+     * @param CartService $cartService
      * @param Product $product
-     * @return \Illuminate\Http\RedirectResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @return RedirectResponse
      */
-    public function addToCart(Request $request, Product $product){
-
-        $cart = session()->get('cart', []);
-
-        if(isset($cart[$product->id])){
-            $cart[$product->id]['quantity']++;
-        }else{
-            $cart[$product->id] = [
-                'name' => $product->name,
-                'price' => $product->price,
-                'quantity' => 1,
-                'image' => $product->image,
-            ];
-        }
-        session()->put('cart', $cart);
+    public function addToCart(CartService $cartService, Product $product): RedirectResponse
+    {
+        $cartService->add($product);
         return redirect()->back()->with(['success' => 'product add to cart']);
     }
 
     /**
      * delete product from cart
+     * @param CartService $cartService
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @return RedirectResponse
      */
-    public function removeCart($id){
-
-        $cart = session()->get('cart', []);
-
-        if(isset($cart[$id])){
-            unset($cart[$id]);
-            session()->put('cart', $cart);
-        }
-
+    public function removeCart(CartService $cartService, $id): RedirectResponse
+    {
+        $product = Product::find($id);
+        $cartService->remove($product);
         return redirect()->back()->with(['success' => 'product delete from cart']);
     }
 }
