@@ -2,45 +2,88 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    /**
+     * Show user in table in admin panel
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application
+     */
     public function index()
     {
-        $users = User::all();
+        $users = User::where('is_admin', false)
+            ->orderBy('created_at', 'desc')
+            ->get();
         return view('user.index', ['users' => $users]);
     }
 
-    public function store(Request $request)
+    /**
+     * Show form for create new user
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function create()
     {
-        $this->authorize('create', User::class);
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $request->password,
-            'is_admin' => false,
-        ]);
-        return redirect()->route('user.index');
-    }
-
-    public function create(){
         $this->authorize('create', User::class);
         return view('user.create');
     }
 
-    public function edit(User $user){
+    /**
+     * Add new user
+     * @param StoreUserRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function store(StoreUserRequest $request)
+    {
+        $this->authorize('create', User::class);
+        User::create([
+            'name' => $request->user_name,
+            'email' => $request->email,
+            'password' => $request->password,
+            'is_admin' => false,
+        ]);
+        return redirect()->back()->with(['success' => 'Add user success']);
+    }
+
+
+    /**
+     * Show form for edit user
+     * @param User $user
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application
+     */
+    public function edit(User $user)
+    {
         return view('user.edit', ['user' => $user]);
     }
 
-    public function update(Request $request, User $user){
+    /**
+     * Update user
+     * @param StoreUserRequest $request
+     * @param User $user
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function update(StoreUserRequest $request, User $user)
+    {
         $this->authorize('update', $user);
-        $user->update($request->only('name', 'email'));
+        $user->update([
+            'name' => $request->user_name,
+            'email' => $request->email,
+            ]);
         return redirect()->route('user.index')->with(['success' => 'user success update']);
     }
 
-    public function destroy(User $user){
+    /**
+     * Delete user
+     * @param User $user
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function destroy(User $user)
+    {
         $this->authorize('delete', $user);
         $user->delete();
         return redirect()->route('user.index')->with(['success' => 'user deleter']);
