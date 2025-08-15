@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreProductRequest;
 use App\Models\Category;
 use App\Models\Product;
-use Illuminate\Http\Request;
+use App\Services\FileUploadService;
+
 
 class ProductController extends Controller
 {
@@ -13,7 +15,9 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with('category')->get();
+        $products = Product::with('category')
+            ->orderBy('created_at', 'desc')
+            ->get();
         return view('product.index', ['products' => $products,]);
     }
 
@@ -29,19 +33,17 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreProductRequest $request, FileUploadService $fileService)
     {
-        $image = $request->file('image');
-        $imageName = uniqid() . '_' . $image->getClientOriginalName();
-        $image->storeAs('/public/product', $imageName);
+        $imageName = $fileService->uploadFile($request->file('image'), 'product');
         Product::create([
-            'name' => $request->name,
+            'name' => $request->product_name,
             'description' => $request->description,
             'image' => $imageName,
             'price' => $request->price,
-            'categories_id' => $request->categories_id
+            'category_id' => $request->category_id
         ]);
-        return redirect()->route('product.index')->with(['success' => 'Product add']);
+        return redirect()->back()->with(['success' => 'Product add']);
     }
 
     /**
@@ -64,25 +66,17 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product)
+    public function update(StoreProductRequest $request, Product $product, FileUploadService $fileService)
     {
         if($request->hasFile('image')){
-            $newImage = $request->file('image');
-            $imageName = uniqid() . '_' . $newImage->getClientOriginalName();
-            $newImage->storeAs('/public/product' , $imageName);
-
-            $oldImage = public_path('storage/product/' . $product->image);
-            if(file_exists($oldImage)){
-                unlink($oldImage);
-            }
-
-            $product->image = $imageName;
+            $fileService->deleteFile('product', $product->image);
+            $product->image = $fileService->uploadFile($request->file('image'), 'product');
         }
 
-        $product->name = $request->name;
+        $product->name = $request->product_name;
         $product->description = $request->description;
         $product->price = $request->price;
-        $product->categories_id = $request->categories_id;
+        $product->category_id = $request->category_id;
         $product->save();
         return redirect()->route('product.index')->with(['success' => 'product update']);
     }
@@ -90,12 +84,9 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Product $product)
+    public function destroy(Product $product, FileUploadService $fileService)
     {
-        $image = public_path('storage/product/' . $product->image);
-        if(file_exists($image)){
-            unlink($image);
-        }
+        $fileService->deleteFile('product', $product->image);
         $product->delete();
         return redirect()->route('product.index')->with(['success' => 'product delete']);
     }
