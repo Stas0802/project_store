@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCategoryRequest;
 use App\Models\Category;
-use Illuminate\Http\Request;
+use App\Services\FileUploadService;
 use Illuminate\Support\Facades\Auth;
+
 
 class CategoryController extends Controller
 {
@@ -13,7 +15,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::all();
+        $categories = Category::orderBy('created_at', 'desc')->get();
         return view('category.index', ['categories' => $categories]);
 
     }
@@ -29,16 +31,14 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCategoryRequest $request, FileUploadService $fileService)
     {
-        $image = $request->file('image');
-        $imageName = uniqid() . '_' . $image->getClientOriginalName();
-        $image->storeAs('/public/category' , $imageName);
+        $imageName = $fileService->uploadFile($request->file('image'), 'category');
         Category::create([
-            'name' => $request->name,
+            'name' => $request->category_name,
             'image'=> $imageName,
             ]);
-        return redirect()->route('category.index')->with(['success' => 'Category add']);
+        return redirect()->back()->with(['success' => 'Category add']);
     }
 
     /**
@@ -60,21 +60,13 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Category $category)
+    public function update(StoreCategoryRequest $request, Category $category, FileUploadService $fiileService)
     {
         if($request->hasFile('image')){
-            $newImage = $request->file('image');
-            $imageName = uniqid() . '_' . $newImage->getClientOriginalName();
-            $newImage->storeAs('public/category' , $imageName);
-
-            $oldName = public_path('storage/category/' . $category->image);
-            if(file_exists($oldName)){
-                unlink($oldName);
-            }
-
-            $category->image = $request->image;
+            $fiileService->deleteFile('category', $category->image);
+            $category->image = $fiileService->uploadFile($request->file('image'), 'category');
         }
-        $category->name = $request->name;
+        $category->name = $request->category_name;
         $category->save();
         return redirect()->route('category.index')->with(['success' => 'category update']);
     }
@@ -82,11 +74,11 @@ class CategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Category $category)
+    public function destroy(Category $category, FileUploadService $fileService)
     {
-        $image = public_path('storage/category/' . $category->image);
-        if(file_exists($image)){
-            unlink($image);
+        $fileService->deleteFile('category', $category->image);
+        if($category->products()->exists()){
+            return back()->with(['error' => 'В этой категории есть товары поэтому ее нельзя удалить!']);
         }
         $category->delete();
         return redirect()->route('category.index')->with(['success' => 'category delete']);
