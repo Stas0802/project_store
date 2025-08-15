@@ -10,35 +10,37 @@
             @csrf
             {{method_field('PATCH')}}
 
-            <!-- Название -->
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" name="name" value="{{$product->name}}" type="text" required class="mt-1 block w-full" />
+            <x-input-label for="product-name" :value="__('Name')" />
+            <x-text-input id="product-name" name="product_name" value="{{$product->name}}" type="text"
+                          class="input-base {{ $errors->getBag('product')->has('product_name') ? 'input-error' : 'input-valid' }}" />
+            <x-input-error :messages="$errors->getBag('product')->get('product_name')"/>
 
-            <!-- Описание -->
             <x-input-label for="description" :value="__('Description')" class="mt-4" />
-            <textarea id="description" name="description" required
-                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">{{$product->description}}</textarea>
+            <textarea id="description" name="description"
+                      class="input-base {{ $errors->getBag('product')->has('description') ? 'input-error' : 'input-valid' }}">{{$product->description}}</textarea>
+            <x-input-error :messages="$errors->getBag('product')->get('description')"/>
 
-            <!-- Цена -->
             <x-input-label for="price" :value="__('Price')" class="mt-4" />
-            <x-text-input id="price" name="price" value="{{$product->price}}" type="number" required class="mt-1 block w-full" />
+            <x-text-input id="price" name="price" value="{{$product->price}}" type="number"
+                          class="input-base {{ $errors->getBag('product')->has('price') ? 'input-error' : 'input-valid' }}" />
+            <x-input-error :messages="$errors->getBag('product')->get('price')"/>
 
-            <!-- Картинка -->
+
             <x-input-label for="image" :value="__('Image')" class="mt-4" />
             <img src="{{asset('storage/product/' . $product->image)}}" alt="{{$product->name}}" class="w-20 h-20">
-            <x-text-input id="image" name="image" type="file" required class="mt-1 block w-full" />
+            <x-text-input id="image" name="image" type="file" class="mt-1 block w-full" />
+            <x-input-error :messages="$errors->getBag('product')->get('image')"/>
 
-            <!-- Категория -->
-            <x-input-label for="categories_id" :value="__('Category')" class="mt-4" />
-            <select id="categories_id" name="categories_id" required
-                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+            <x-input-label for="category_id" :value="__('Category')" class="mt-4" />
+            <select id="category_id" name="category_id"
+                    class="input-base {{ $errors->getBag('product')->has('category_id') ? 'input-error' : 'input-valid'  }}">
                 <option value="" selected disabled>{{ __('Choose category') }}</option>
                 @foreach($categories as $category)
                     <option value="{{ $category->id }}">{{ $category->name }}</option>
                 @endforeach
             </select>
+            <x-input-error :messages="$errors->getBag('product')->get('category_id')"/>
 
-            <!-- Кнопка -->
             <x-primary-button class="mt-4">
                 {{ __('Edite Product') }}
             </x-primary-button>
