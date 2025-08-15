@@ -38,6 +38,7 @@ class ProfileController extends Controller
     }
 
     /**
+     * Stop delete acount adminastrate
      * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse
@@ -47,6 +48,10 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
+
+        if($user->is_admin){
+            return back()->with(['error' => 'Вы не можете удалить акаунт Администратора ! ']);
+        }
 
         Auth::logout();
 
