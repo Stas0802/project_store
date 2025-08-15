@@ -4,44 +4,42 @@
             {{ __('All categories') }}
         </h2>
     </x-slot>
-
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+        <div class="page-container">
+            <div class="table-container">
                 <div class="p-6 text-gray-900">
-{{--                    @if(session('success'))--}}
-{{--                        <div class="mb-4 p-4 bg-green-100 text-green-800 rounded shadow">--}}
-{{--                            {{ session('success') }}--}}
-{{--                        </div>--}}
-{{--                    @endif--}}
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                    <table class="table-base">
+                        <div class="mb-4">
+                            <input type="text" id="product-search" placeholder="Поиск по имени" class="border p-2 w-60 rounded">
+                        </div>
+                        <thead class="bg-gray-900">
                         <tr>
-                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">ID</th>
-                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Name</th>
-                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Image</th>
-                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Date</th>
-                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Action</th>
-                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Action</th>
+                            <th class="table-head-cell">ID</th>
+                            <th class="table-head-cell">Name</th>
+                            <th class="table-head-cell">Image</th>
+                            <th class="table-head-cell">Date</th>
+                            <th class="table-head-cell">Action</th>
+                            <th class="table-head-cell">Action</th>
                         </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody class="table-body">
                         @foreach($categories as $category)
                             <tr>
-                                <td class="px-4 py-2 text-sm text-gray-700">{{ $category->id }}</td>
-                                <td class="px-4 py-2 text-sm text-gray-700">{{ $category->name }}</td>
-                                <td class="px-4 py-2 text-sm text-gray-700">
+                                <td class="table-body-cell">{{ $category->id }}</td>
+                                <td class="table-body-cell">{{ $category->name }}</td>
+                                <td class="table-body-cell">
                                     <img src="{{ asset('storage/category/' . $category->image) }}" alt="{{$category->name}}" class="w-20 h-20">
                                 </td>
-                                <td class="px-4 py-2 text-sm text-gray-700">{{ $category->created_at->format('d M Y H:i') }}</td>
-                                <td class="px-4 py-2 text-sm text-gray-700">
+                                <td class="table-body-cell">{{ $category->created_at->format('d M Y H:i') }}</td>
+                                <td class="table-body-cell">
                                     <form action="{{route('category.destroy', $category)}}" method="POST">
                                         @csrf
                                         {{method_field('DELETE')}}
-                                        <button type="submit">delete</button>
+                                        <button type="submit" class="btn-delete">delete</button>
                                     </form>
                                 </td>
-                                <td class="px-4 py-2 text-sm text-gray-700"><a href="{{ route('category.edit', $category) }}">update</a></td>
+                                <td class="table-body-cell">
+                                    <a href="{{ route('category.edit', $category) }}" class="btn-update">update</a></td>
                             </tr>
                         @endforeach
                         </tbody>
