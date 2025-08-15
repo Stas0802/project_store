@@ -4,33 +4,38 @@
             {{ __('All users') }}
         </h2>
     </x-slot>
-
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+        <div class="page-container">
+            <div class="table-container">
                 <div class="p-6 text-gray-900">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                    <table class="table-base">
+                        <div class="mb-4">
+                            <input type="text" id="product-search" placeholder="Поиск по имени" class="border p-2 w-60 rounded">
+                        </div>
+                        <thead class="bg-gray-900">
                         <tr>
-                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Имя</th>
-                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Email</th>
-                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Action</th>
-                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Action</th>
+                            <th class="table-head-cell">Имя</th>
+                            <th class="table-head-cell">Email</th>
+                            <th class="table-head-cell">Date</th>
+                            <th class="table-head-cell">Action</th>
+                            <th class="table-head-cell">Action</th>
                         </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody class="table-body">
                         @foreach($users as $user)
                             <tr>
-                                <td class="px-4 py-2 text-sm text-gray-700">{{ $user->name }}</td>
-                                <td class="px-4 py-2 text-sm text-gray-700">{{ $user->email }}</td>
-                                <td class="px-4 py-2 text-sm text-gray-700">
+                                <td class="table-body-cell">{{ $user->name }}</td>
+                                <td class="table-body-cell">{{ $user->email }}</td>
+                                <td class="table-body-cell">{{ $user->created_at->format('d M Y H:i') }}</td>
+                                <td class="table-body-cell">
                                     <form action="{{route('user.destroy', $user->id)}}" method="POST">
                                         @csrf
                                         {{method_field('DELETE')}}
-                                        <button type="submit">delete</button>
+                                        <button type="submit" class="btn-delete">delete</button>
                                     </form>
                                 </td>
-                                <td class="px-4 py-2 text-sm text-gray-700"><a href="{{ route('user.edit', $user->id) }}">update</a></td>
+                                <td class="table-body-cell">
+                                    <a href="{{ route('user.edit', $user->id) }}" class="btn-update">update</a></td>
                             </tr>
                         @endforeach
                         </tbody>
