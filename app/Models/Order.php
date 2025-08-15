@@ -10,6 +10,7 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
+        'order_number',
         'costumer_name',
         'costumer_surname',
         'phone_number',
@@ -17,11 +18,21 @@ class Order extends Model
         'status_id',
     ];
 
-    public function products(){
-        return $this->belongsToMany(Product::class)->withPivot('quantity')->withTimestamps();
+    /**
+     * The order contains multiple products.
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function products()
+    {
+        return $this->belongsToMany(Product::class)->withPivot('quantity', 'price', 'total')->withTimestamps();
     }
 
-    public function status(){
+    /**
+     * The order has one status.
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function status()
+    {
         return $this->belongsTo(Status::class);
     }
 }
