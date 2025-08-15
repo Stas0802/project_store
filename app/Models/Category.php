@@ -13,16 +13,30 @@ class Category extends Model
 
     protected $fillable = ['name', 'image', 'slug'];
 
-    public function products(){
-        return $this->hasMany(Product::class, 'categories_id');
+    /**
+     *  Category has many products.
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'category_id');
     }
 
-    public function getRouteKeyName()
+    /**
+     * slug is used instead of id.
+     * @return string
+     */
+    public function getRouteKeyName(): string
     {
         return 'slug';
     }
 
-    protected static function booted(){
+    /**
+     * HasSlug trait behavior when loading a model
+     * @return void
+     */
+    protected static function booted(): void
+    {
         static::bootHasSlug();
     }
 }
