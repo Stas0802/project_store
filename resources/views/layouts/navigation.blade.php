@@ -29,9 +29,16 @@
                     </x-nav-link>
                 </div>
 
+
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('category.index')">
                         {{ __('Categories') }}
+                    </x-nav-link>
+                </div>
+
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('order.index')">
+                        {{ __('Orders') }}
                     </x-nav-link>
                 </div>
             </div>
@@ -52,13 +59,15 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
+                       @if(Auth::user()->is_admin)
+                            <x-dropdown-link :href="route('profile.edit')">
+                                {{ __('Profile') }}
+                            </x-dropdown-link>
 
-                        <x-dropdown-link :href="route('user.create')">
-                            {{ __('Add user') }}
-                        </x-dropdown-link>
+                            <x-dropdown-link :href="route('user.create')">
+                                {{ __('Add user') }}
+                            </x-dropdown-link>
+                       @endif
 
                         <x-dropdown-link :href="route('product.create')">
                             {{ __('Add product') }}
