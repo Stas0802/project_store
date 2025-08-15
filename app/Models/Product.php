@@ -16,23 +16,42 @@ class Product extends Model
         'image',
         'price',
         'slug',
-        'categories_id',
+        'category_id',
     ];
 
-    public function category(){
-        return $this->belongsTo(Category::class, 'categories_id');
+    /**
+     * the product belongs to the category
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
-    public function orders(){
-        return $this->belongsToMany(Order::class)->withPivot('quantity')->withTimestamps();
+    /**
+     * the product can be in several orders
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class)->withPivot('quantity', 'price', 'total')->withTimestamps();
     }
 
-    public function getRouteKeyName()
+    /**
+     * slug is used instead of id.
+     * @return string
+     */
+    public function getRouteKeyName(): string
     {
         return 'slug';
     }
 
-    protected static function booted(){
+    /**
+     * HasSlug trait behavior when loading a model
+     * @return void
+     */
+    protected static function booted(): void
+    {
         static::bootHasSlug();
     }
 }
