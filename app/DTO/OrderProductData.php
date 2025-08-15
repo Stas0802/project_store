@@ -15,6 +15,7 @@ class OrderProductData
     }
 
     /**
+     * Creates an instance of an object from an array of data, given a quantity.
      * @param int $productId
      * @param array $data
      * @return self|null
